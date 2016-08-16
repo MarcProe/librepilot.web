@@ -41,8 +41,16 @@ public class RootHandler extends AbstractHandler {
 
         PrintWriter out = response.getWriter();
 
+    out.println("<h1>LibrePilot.web</h1>");
+        out.println("<h2>Examples:</h2>");
+       out.println("All Settings Objects: <a href=\"/settings\">/settings</a><br />");
+        out.println("Specific Settings Object: <a href=\"/settings/StabilizationSettingsBank2\">/settings/StabilizationSettingsBank2</a><br />");
 
-       out.println("<a href=\"/settings\">/settings?name=xxx</a><br />");
+        out.println("All State Objects: <a href=\"/state\">/state</a><br />");
+        out.println("Specifics State Object: <a href=\"/state/AttitudeState\">/state/AttitudeState</a><br />");
+
+        out.println("All Objects: <a href=\"/objects\">/objects</a><br />");
+        out.println("Specific Object: <a href=\"/objects/ActuatorDesired\">/objects/ActuatorDesired</a><br />");
 
         baseRequest.setHandled(true);
     }

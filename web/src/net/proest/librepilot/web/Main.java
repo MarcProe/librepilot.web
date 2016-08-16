@@ -38,9 +38,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class Main {
-    public Map<String, UAVTalkXMLObject> mXmlObjects = null;
-    public String mUavoLongHash;
-    public boolean mDoReconnect;
+    private Map<String, UAVTalkXMLObject> mXmlObjects = null;
+    private String mUavoLongHash;
+    private boolean mDoReconnect;
 
     public static void main( String[] args ) throws Exception {
 
@@ -58,10 +58,16 @@ public class Main {
         context.setHandler((Handler) new RootHandler());
 
         ContextHandler contextSettings = new ContextHandler("/settings");
-        contextSettings.setHandler((Handler) new WebHandler(dev));
+        contextSettings.setHandler(new WebHandler(dev, true, false));
+
+        ContextHandler contextState = new ContextHandler("/state");
+        contextState.setHandler(new WebHandler(dev, false, true));
+
+        ContextHandler contextObjects = new ContextHandler("/objects");
+        contextObjects.setHandler(new WebHandler(dev, true, true));
 
         ContextHandlerCollection contexts = new ContextHandlerCollection();
-        contexts.setHandlers(new Handler[] { context, contextSettings });
+        contexts.setHandlers(new Handler[] { context, contextSettings, contextState, contextObjects });
 
         server.setHandler(contexts);
 
@@ -70,7 +76,7 @@ public class Main {
 
     }
 
-    public boolean loadXmlObjects() {
+    private boolean loadXmlObjects() {
         System.out.println("starting load");
         if (mXmlObjects == null) {
             mXmlObjects = new TreeMap<>();

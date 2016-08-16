@@ -28,17 +28,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class WebHandler extends AbstractHandler {
-    final static short vendorId = 0x20a0;
-    final static short productId = 0x415b;
     private final FcDevice mFcDevice;
+    private boolean mShowSettings = true;
+    private boolean mShowState = true;
 
-    public WebHandler(FcDevice device){
-
+    public WebHandler(FcDevice device, boolean showSettings, boolean showState){
         mFcDevice = device;
+
+        mShowSettings = showSettings;
+        mShowState = showState;
     }
 
     public void handle( String target,
@@ -51,14 +52,22 @@ public class WebHandler extends AbstractHandler {
         response.setStatus(HttpServletResponse.SC_OK);
 
         PrintWriter out = response.getWriter();
+        System.out.println();
+        System.out.println(target);
+        System.out.println(baseRequest.getContextPath());
+        System.out.println(baseRequest.getPathTranslated());
 
+        String targetObject = target.replace("/","").trim();
+        System.out.println(targetObject);
 
         Set<UAVTalkXMLObject> objects = new HashSet<>();
         //get all settings objects
         for(UAVTalkXMLObject xmlObj : mFcDevice.getObjectTree().getXmlObjects().values()) {
-            if (xmlObj.isSettings()) {
-                mFcDevice.requestObject(xmlObj.getName());
-                objects.add(xmlObj);
+            if(targetObject.equals("") || targetObject.equals(xmlObj.getName())) {
+                if (mShowSettings && xmlObj.isSettings() || mShowState && !xmlObj.isSettings()) {
+                    mFcDevice.requestObject(xmlObj.getName());
+                    objects.add(xmlObj);
+                }
             }
         }
 
@@ -68,13 +77,15 @@ public class WebHandler extends AbstractHandler {
             e.printStackTrace();
         }
 
-        out.print("{\r\n\t\"uavo\":\r\n{");
+        out.println("{\r\n\t\"uavo\": {");
 
+        boolean hasdata = false;
         int j = 0;
         for (UAVTalkXMLObject xmlObj : objects) {
             j++;
-            if(request.getParameter("name") == null || request.getParameter("name").equals(xmlObj.getName())) {
-                if (xmlObj.isSettings()) {
+
+            if(targetObject.equals("") || targetObject.equals(xmlObj.getName())) {
+                if (mShowSettings && xmlObj.isSettings() || mShowState && !xmlObj.isSettings()) {
 
                     out.println("\t\t\"" + xmlObj.getName() + "\": {");
                     int i = 0;
@@ -88,12 +99,13 @@ public class WebHandler extends AbstractHandler {
                             } else {
                                 out.println("");
                             }
+                            hasdata = true;
                         } catch (UAVTalkMissingObjectException e) {
                             VisualLog.d("SETTINGS", e.getMessage());
                         }
                     }
                     out.print("\t\t}");
-                    if(j < objects.size() && request.getParameter("name") == null) {
+                    if(j < objects.size() && targetObject.equals("") ) {
                         out.println(",");
                     } else {
                         out.println("");
@@ -103,6 +115,10 @@ public class WebHandler extends AbstractHandler {
 
         }
 
+        if(!hasdata) {
+            out.println("\t\t\t\"error\": \"object not found\",");
+            out.println("\t\t\t\"request\": \""+targetObject+"\"");
+        }
 
         out.println("\t}\r\n}");
 

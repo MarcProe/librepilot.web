@@ -44,6 +44,9 @@ import net.proest.librepilot.web.uavtalk.UAVTalkObjectTree;
 import net.proest.librepilot.web.uavtalk.UAVTalkXMLObject;
 
 import javax.usb.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class FcUsbDevice extends FcDevice {
@@ -56,7 +59,16 @@ public class FcUsbDevice extends FcDevice {
     //private UsbRequest mOutRequest = null;
 
     final static short vendorId = 0x20a0;
-    final static short productId = 0x415b;
+    final static List<Short> productId = Arrays.asList(new Short[] {
+            0x415A, //USB_PRODUCT_ID_OPENPILOT_MAIN
+            0x415B, //USB_PRODUCT_ID_COPTERCONTROL
+            0x415C, //USB_PRODUCT_ID_OPLINK
+            0x415D, //USB_PRODUCT_ID_CC3D
+            0x415E, //USB_PRODUCT_ID_REVOLUTION
+            0x41D0, // was 0x415E during LP testing // USB_PRODUCT_ID_SPARKY2
+            0x4194, // USB_PRODUCT_ID_OSD
+            0x4195 // USB_PRODUCT_ID_SPARE
+    });
 
     public static final int USB_ENDPOINT_XFER_INT = 3;
     public static final int USB_DIR_OUT = 0;
@@ -308,11 +320,11 @@ public class FcUsbDevice extends FcDevice {
         return true;
     }
 
-    private UsbDevice findDevice(UsbHub hub, short vendorId, short productId) {
+    private UsbDevice findDevice(UsbHub hub, short vendorId, List<Short> productId) {
         for (Object o : hub.getAttachedUsbDevices()) {
             UsbDevice device = (UsbDevice) o;
             UsbDeviceDescriptor desc = device.getUsbDeviceDescriptor();
-            if (desc.idVendor() == vendorId && desc.idProduct() == productId) {
+            if (desc.idVendor() == vendorId && productId.contains(desc.idProduct())) {
                 return device;
             }
             if (device.isUsbHub()) {

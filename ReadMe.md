@@ -7,7 +7,7 @@
     * `apt-get install git`
   4. Get the code
     * `git clone https://github.com/marcproe/librepilot.web.git`
-  5. Connect a CC3D via USB (only CC3D right now) and wait for it to boot.
+  5. Connect a flight controller with LibrePilot flashed (connect only *1*, the server will claim the first it finds)
   6. Start the Server 
     * `java -jar librepilot.web/out/artifacts/web_jar/web.jar`
   7. Open the website on http://yourip:8080
