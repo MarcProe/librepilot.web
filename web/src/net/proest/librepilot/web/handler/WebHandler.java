@@ -68,7 +68,7 @@ public class WebHandler extends AbstractHandler {
             e.printStackTrace();
         }
 
-        out.println("{\"uavo\":\r\n{");
+        out.print("{\r\n\t\"uavo\":\r\n{");
 
         int j = 0;
         for (UAVTalkXMLObject xmlObj : objects) {
@@ -76,13 +76,13 @@ public class WebHandler extends AbstractHandler {
             if(request.getParameter("name") == null || request.getParameter("name").equals(xmlObj.getName())) {
                 if (xmlObj.isSettings()) {
 
-                    out.println("\"" + xmlObj.getName() + "\": {");
+                    out.println("\t\t\"" + xmlObj.getName() + "\": {");
                     int i = 0;
                     for (UAVTalkXMLObject.UAVTalkXMLObjectField xmlField : xmlObj.getFields().values()) {
                         i++;
                         try {
                             Object res = mFcDevice.getObjectTree().getData(xmlObj.getName(), xmlField.getName());
-                            out.print("\"" + xmlField.getName() + "\": \"" + res + "\"");
+                            out.print("\t\t\t\"" + xmlField.getName() + "\": \"" + res + "\"");
                             if(i < xmlObj.getFields().size()) {
                                 out.println(",");
                             } else {
@@ -92,7 +92,7 @@ public class WebHandler extends AbstractHandler {
                             VisualLog.d("SETTINGS", e.getMessage());
                         }
                     }
-                    out.print("}");
+                    out.print("\t\t}");
                     if(j < objects.size() && request.getParameter("name") == null) {
                         out.println(",");
                     } else {
@@ -104,7 +104,7 @@ public class WebHandler extends AbstractHandler {
         }
 
 
-        out.println("}\r\n}");
+        out.println("\t}\r\n}");
 
         baseRequest.setHandled(true);
     }
