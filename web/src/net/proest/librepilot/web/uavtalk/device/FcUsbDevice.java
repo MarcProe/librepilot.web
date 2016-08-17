@@ -44,7 +44,6 @@ import net.proest.librepilot.web.uavtalk.UAVTalkObjectTree;
 import net.proest.librepilot.web.uavtalk.UAVTalkXMLObject;
 
 import javax.usb.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -102,17 +101,6 @@ public class FcUsbDevice extends FcDevice {
         UsbDeviceDescriptor desc = device.getUsbDeviceDescriptor();
         UsbConfiguration configuration = device.getActiveUsbConfiguration();
         UsbInterface iface = null;
-
-        /*
-        for (int i = 0; i < count; i++) {
-            UsbInterface intf = device.getInterface(i);
-            if (intf.getInterfaceClass() == 3
-                    && intf.getInterfaceSubclass() == 0
-                    && intf.getInterfaceProtocol() == 0) {
-                return intf;
-            }
-        }
-        */
 
         for (Object o : configuration.getUsbInterfaces()) {
             iface = (UsbInterface) o;
@@ -206,40 +194,40 @@ public class FcUsbDevice extends FcDevice {
     protected boolean writeByteArray(byte[] bytes) {
         boolean retval = false;
 
-        int psize = 62;//mEndpointOut.getMaxPacketSize() - 2;
+        int psize = mEndpointOut.getUsbEndpointDescriptor().wMaxPacketSize() -2; //62;//mEndpointOut.getMaxPacketSize() - 2;
         int toWrite = bytes.length;
+        UsbPipe pipe = mEndpointOut.getUsbPipe();
+        try {
+            System.out.println("open pipe");
+            pipe.open();
+            System.out.println("pipe opened");
+            while (toWrite > 0) {
+                int sendlen = toWrite - psize > 0 ? psize : toWrite;
+                byte[] buffer = new byte[sendlen + 2];
 
-        while (toWrite > 0) {
-            int sendlen = toWrite - psize > 0 ? psize : toWrite;
-            byte[] buffer = new byte[sendlen + 2];
+                System.arraycopy(bytes, bytes.length - toWrite, buffer, 2, sendlen);
+                buffer[0] = (byte) 0x02;//report id, is always 2. Period.
+                buffer[1] = (byte) ((sendlen) & 0xff);//bytes to send, which is packet.size()-2
 
-            System.arraycopy(bytes, bytes.length - toWrite, buffer, 2, sendlen);
-            buffer[0] = (byte) 0x02;//report id, is always 2. Period.
-            buffer[1] = (byte) ((sendlen) & 0xff);//bytes to send, which is packet.size()-2
-
-            /*if (mOutRequest == null) {
-                mOutRequest = new UsbRequest();
-                mOutRequest.initialize(mDeviceConnection, mEndpointOut);
-            }
-
-            retval = mOutRequest.queue(ByteBuffer.wrap(buffer), buffer.length);
-            */
-            UsbPipe pipe = mEndpointOut.getUsbPipe();
-            try {
-                pipe.open();
+                System.out.println("submit pipe");
                 int sent = pipe.syncSubmit(buffer);
+                //pipe.asyncSubmit(buffer);
+                System.out.println("pipe submited");
+                System.out.println(""+sent);
                 retval = true;
-            } catch (UsbException e) {
-                return false;
-            } finally {
-                try {
-                    pipe.close();
-                } catch (UsbException e) {
-                    e.printStackTrace();
-                }
-            }
 
-            toWrite -= sendlen;
+
+                toWrite -= sendlen;
+            }
+        } catch (UsbException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                pipe.close();
+            } catch (UsbException e) {
+                e.printStackTrace();
+            }
         }
 
         return retval;
@@ -309,7 +297,7 @@ public class FcUsbDevice extends FcDevice {
         }
 
         if (nackedObjects.contains(xmlObj.getId())) {
-            //VisualLog.d("NACKED", xmlObj.getId());
+            VisualLog.d("NACKED", xmlObj.getId());
             return false;  //if it was already nacked, don't try to get it again
         }
 

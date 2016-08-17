@@ -52,6 +52,27 @@ public class RootHandler extends AbstractHandler {
         out.println("All Objects: <a href=\"/objects\">/objects</a><br />");
         out.println("Specific Object: <a href=\"/objects/ActuatorDesired\">/objects/ActuatorDesired</a><br />");
 
+        out.println("Multiple Objects: <a href=\"/settings/StabilizationSettingsBank2/StabilizationSettingsBank1/StabilizationSettingsBank3/\">/settings/StabilizationSettingsBank2/StabilizationSettingsBank1/StabilizationSettingsBank3/</a>");
+
+        out.println("Add a JavaScript Callback: <a href=\"/objects/ActuatorDesired/?callback=getUavo\">/objects/ActuatorDesired/?callback=getUavo</a><br />");
+
+        out.println("<hr />All Settings Definitions: <a href=\"/defsettings\">/defsettings</a><br />");
+        out.println("Specific Settings Definition: <a href=\"/defsettings/StabilizationSettingsBank2\">/defsettings/StabilizationSettingsBank2</a><br />");
+
+        out.println("All State Definitions: <a href=\"/defstate\">/defstate</a><br />");
+        out.println("Specifics State Definition: <a href=\"/defstate/AttitudeState\">/defstate/AttitudeState</a><br />");
+
+        out.println("All Definitions: <a href=\"/defobjects\">/defobjects</a><br />");
+        out.println("Specific Definition: <a href=\"/defobjects/ActuatorDesired\">/defobjects/ActuatorDesired</a><br />");
+
+        out.println("Add a JavaScript Callback: <a href=\"/defobjects/ActuatorDesired/?callback=getDef\">/defobjects/ActuatorDesired/?callback=getDef</a><br />");
+
+        out.println("Multiple Definitions: <a href=\"/defsettings/StabilizationSettingsBank2/StabilizationSettingsBank1/StabilizationSettingsBank3/\">/defsettings/StabilizationSettingsBank2/StabilizationSettingsBank1/StabilizationSettingsBank3/</a>");
+
+        out.println("<hr />");
+
+        out.println("(This does not work yet)<form action=\'/objects\' method=\'post\'><input name=\'json\' type=\"text\" value=\'{\"uavo\":{\"AccelGyroSettings\": {\"gyro_temp_coeff\": \"0.0\"}}}\'/> <input type=\'submit\' value=\'Submit\'></form>");
+
         baseRequest.setHandled(true);
     }
 }

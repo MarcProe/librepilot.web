@@ -16,10 +16,13 @@
 
 package net.proest.librepilot.web.uavtalk;
 
+import java.util.SortedMap;
+
 public class UAVTalkObjectInstance {
 
     private final int mId;
     private byte[] mData;
+    private SortedMap<String, Object> mDecodedFields;
 
     public UAVTalkObjectInstance(int id, byte[] data) {
         this.mId = id;
@@ -28,6 +31,14 @@ public class UAVTalkObjectInstance {
 
     public byte[] getData() {
         return mData;
+    }
+
+    public SortedMap<String, Object> getFields() {
+        return this.mDecodedFields;
+    }
+
+    public void setFields(SortedMap<String, Object> fields) {
+        this.mDecodedFields = fields;
     }
 
     public void setData(byte[] data) {

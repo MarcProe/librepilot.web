@@ -16,8 +16,10 @@
 
 package net.proest.librepilot.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import net.proest.librepilot.web.handler.DefinitionHandler;
 import net.proest.librepilot.web.handler.RootHandler;
-import net.proest.librepilot.web.handler.WebHandler;
+import net.proest.librepilot.web.handler.ObjectHandler;
 import net.proest.librepilot.web.uavtalk.UAVTalkXMLObject;
 import net.proest.librepilot.web.uavtalk.device.FcDevice;
 import net.proest.librepilot.web.uavtalk.device.FcUsbDevice;
@@ -58,16 +60,29 @@ public class Main {
         context.setHandler((Handler) new RootHandler());
 
         ContextHandler contextSettings = new ContextHandler("/settings");
-        contextSettings.setHandler(new WebHandler(dev, true, false));
+        contextSettings.setHandler(new ObjectHandler(dev, true, false));
 
         ContextHandler contextState = new ContextHandler("/state");
-        contextState.setHandler(new WebHandler(dev, false, true));
+        contextState.setHandler(new ObjectHandler(dev, false, true));
 
         ContextHandler contextObjects = new ContextHandler("/objects");
-        contextObjects.setHandler(new WebHandler(dev, true, true));
+        contextObjects.setAllowNullPathInfo(true);
+        contextObjects.setHandler(new ObjectHandler(dev, true, true));
+
+        ContextHandler contextDefSettings = new ContextHandler("/defsettings");
+        contextDefSettings.setHandler(new DefinitionHandler(dev, true, false));
+
+        ContextHandler contextDefState = new ContextHandler("/defstate");
+        contextDefState.setHandler(new DefinitionHandler(dev, false, true));
+
+        ContextHandler contextDefObjects = new ContextHandler("/defobjects");
+        contextDefObjects.setHandler(new DefinitionHandler(dev, true, true));
 
         ContextHandlerCollection contexts = new ContextHandlerCollection();
-        contexts.setHandlers(new Handler[] { context, contextSettings, contextState, contextObjects });
+        contexts.setHandlers(new Handler[] { context,
+                contextSettings, contextState, contextObjects,
+                contextDefObjects, contextDefSettings, contextDefState
+        });
 
         server.setHandler(contexts);
 

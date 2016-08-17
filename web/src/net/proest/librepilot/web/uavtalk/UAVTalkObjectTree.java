@@ -150,7 +150,7 @@ public class UAVTalkObjectTree {
 
         UAVTalkObject obj = getObjectNoCreate(objectname);
         if (obj == null) {
-            UAVTalkMissingObjectException e = new UAVTalkMissingObjectException();
+            UAVTalkMissingObjectException e = new UAVTalkMissingObjectException(objectname+"."+instance+"."+fieldname+"."+element);
             e.setInstance(instance);
             e.setObjectname(objectname);
             e.setIsSettings(xmlobj.isSettings());
@@ -159,7 +159,7 @@ public class UAVTalkObjectTree {
 
         UAVTalkObjectInstance ins = obj.getInstance(instance);
         if (ins == null) {
-            UAVTalkMissingObjectException e = new UAVTalkMissingObjectException();
+            UAVTalkMissingObjectException e = new UAVTalkMissingObjectException(objectname+"."+instance+"."+fieldname+"."+element);
             e.setInstance(instance);
             e.setObjectname(objectname);
             e.setIsSettings(xmlobj.isSettings());

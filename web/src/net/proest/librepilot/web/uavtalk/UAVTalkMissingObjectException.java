@@ -21,6 +21,10 @@ public class UAVTalkMissingObjectException extends Exception {
     private boolean mIsSettings;
     private String mObjectName;
 
+    UAVTalkMissingObjectException(String message) {
+        super(message);
+    }
+
     public int getInstance() {
         return mInstance;
     }

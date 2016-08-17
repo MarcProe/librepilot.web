@@ -35,7 +35,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 @SuppressWarnings("WeakerAccess")
-public class UAVTalkXMLObject {
+public class UAVTalkXMLObject implements Comparable {
 
     public static final String FIELDNAME_ENUM = "enum";
     public static final String FIELDNAME_FLOAT32 = "float";
@@ -333,6 +333,11 @@ public class UAVTalkXMLObject {
         }
 
         return hashout;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return mName.compareTo(((UAVTalkXMLObject)o).getName());
     }
 
     //TODO: Getter and Setter
