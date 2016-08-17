@@ -16,6 +16,9 @@
 
 package net.proest.librepilot.web.uavtalk;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import net.proest.librepilot.web.H;
 import net.proest.librepilot.web.VisualLog;
 import org.w3c.dom.Document;
@@ -35,6 +38,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 @SuppressWarnings("WeakerAccess")
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class UAVTalkXMLObject implements Comparable {
 
     public static final String FIELDNAME_ENUM = "enum";
@@ -155,10 +159,7 @@ public class UAVTalkXMLObject implements Comparable {
                     String optionsString = f.getAttribute(XML_ATT_OPTIONS);
                     try {
                         Object[] oa = Arrays.asList(optionsString.split(XML_ATTRIBUTE_SPLITTER)).toArray();
-                        //uavField.mOptions =
-                        //        (String[]) Arrays
-                        //                .asList(optionsString.split(XML_ATTRIBUTE_SPLITTER))
-                        //                .toArray();
+
                         uavField.mOptions = Arrays.copyOf(oa, oa.length, String[].class);
                     } catch (Exception e1) {
                         e1.printStackTrace();
@@ -222,6 +223,7 @@ public class UAVTalkXMLObject implements Comparable {
                 uavField.mSize = uavField.mElementCount;
                 uavField.mTypelength = 1;
             }
+
             x++;
 
             mFields.put(uavField.mName, uavField);
@@ -341,6 +343,7 @@ public class UAVTalkXMLObject implements Comparable {
     }
 
     //TODO: Getter and Setter
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public class UAVTalkXMLObjectField implements Comparable<UAVTalkXMLObjectField> {
         int mElementCount;
         ArrayList<String> mElements;
@@ -351,8 +354,21 @@ public class UAVTalkXMLObject implements Comparable {
         int mType;
         int mTypelength;
 
+        @JsonIgnore
         public ArrayList<String> getElements() {
             return mElements;
+        }
+
+        @JsonProperty("elements")
+        public ArrayList<String> getJsonElements() {
+            if(mElements.size() <= 1 && (mElements.get(0) == null || mElements.get(0).equals("") || mElements.get(0).equals("0"))) {
+                System.out.println("E");
+                return new ArrayList<>();
+            } else {
+                System.out.println("F");
+                return mElements;
+            }
+
         }
 
         public String getName() {
@@ -363,6 +379,7 @@ public class UAVTalkXMLObject implements Comparable {
             return mOptions;
         }
 
+        @JsonIgnore
         public int getType() {
             return mType;
         }
@@ -375,6 +392,25 @@ public class UAVTalkXMLObject implements Comparable {
         public String toString() {
             return mName + " Pos: " + mPos + " ElementCount: " + mElementCount + " Size:" + mSize +
                     " Type:" + mType;
+        }
+
+        @JsonProperty("type")
+        public String getTypeString() {
+            return getFieldTypeName(mType);
+        }
+
+        private String getFieldTypeName(int type) {
+            switch (type) {
+                case FIELDTYPE_ENUM: return FIELDNAME_ENUM;
+                case FIELDTYPE_FLOAT32: return FIELDNAME_FLOAT32;
+                case FIELDTYPE_INT8: return FIELDNAME_INT8;
+                case FIELDTYPE_INT16: return FIELDNAME_INT16;
+                case FIELDTYPE_INT32: return FIELDNAME_INT32;
+                case FIELDTYPE_UINT8: return FIELDNAME_UINT8;
+                case FIELDTYPE_UINT16: return FIELDNAME_UINT16;
+                case FIELDTYPE_UINT32: return FIELDNAME_FLOAT32;
+            }
+            return "";
         }
     }
 }
