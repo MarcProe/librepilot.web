@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LinrePilot.web Hate it or love it. Or go have a beer. And some crayfish.</title>
+</head>
+<body>
+<h1>LibrePilot.web</h1>
+<h2>Examples:</h2>
+All Settings Objects: <a href="/settings">/settings</a><br/>
+Specific Settings Object: <a href="/settings/StabilizationSettingsBank2">/settings/StabilizationSettingsBank2</a><br/>
+All State Objects: <a href="/state">/state</a><br/>
+Specifics State Object: <a href="/state/AttitudeState">/state/AttitudeState</a><br/>
+All Objects: <a href="/objects">/objects</a><br/>
+Specific Object: <a href="/objects/ActuatorDesired">/objects/ActuatorDesired</a><br/>
+Add a JavaScript Callback: <a href="/objects/ActuatorDesired/?callback=getUavo">/objects/ActuatorDesired/?callback=getUavo</a><br/>
+Multiple Objects: <a href="/settings/StabilizationSettingsBank2/StabilizationSettingsBank1/StabilizationSettingsBank3/">/settings/StabilizationSettingsBank2/StabilizationSettingsBank1/StabilizationSettingsBank3/</a><br/>
+<hr/>
+All Settings Definitions: <a href="/defsettings">/defsettings</a><br/>
+Specific Settings Definition: <a
+        href="/defsettings/StabilizationSettingsBank2">/defsettings/StabilizationSettingsBank2</a><br/>
+All State Definitions: <a href="/defstate">/defstate</a><br/>
+Specifics State Definition: <a href="/defstate/AttitudeState">/defstate/AttitudeState</a><br/>
+All Definitions: <a href="/defobjects">/defobjects</a><br/>
+Specific Definition: <a href="/defobjects/ActuatorDesired">/defobjects/ActuatorDesired</a><br/>
+Add a JavaScript Callback: <a href="/defobjects/ActuatorDesired/?callback=getDef">/defobjects/ActuatorDesired/?callback=getDef</a><br/>
+Multiple Definitions: <a
+        href="/defsettings/StabilizationSettingsBank2/StabilizationSettingsBank1/StabilizationSettingsBank3/">/defsettings/StabilizationSettingsBank2/StabilizationSettingsBank1/StabilizationSettingsBank3/</a>
+<hr/>
+(This does not work yet)
+<form action='/objects' method='post'>
+    <input name='json' type="text" value='{"uavo":{"AccelGyroSettings": {"gyro_temp_coeff": "0.0"}}}'/>
+    <inputtype
+    ='submit' value='Submit'>
+</form>
+
+</body>
+</html>

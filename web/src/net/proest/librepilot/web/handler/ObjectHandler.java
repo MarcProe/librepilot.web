@@ -24,7 +24,6 @@ import net.proest.librepilot.web.serialize.UAVTalkInstanceSerializer;
 import net.proest.librepilot.web.serialize.UAVTalkObjectSerializer;
 import net.proest.librepilot.web.uavtalk.UAVTalkMissingObjectException;
 import net.proest.librepilot.web.uavtalk.UAVTalkObject;
-import net.proest.librepilot.web.uavtalk.UAVTalkObjectInstance;
 import net.proest.librepilot.web.uavtalk.UAVTalkXMLObject;
 import net.proest.librepilot.web.uavtalk.device.FcDevice;
 import org.eclipse.jetty.server.Request;
@@ -47,47 +46,37 @@ public class ObjectHandler extends AbstractHandler {
     private boolean mShowSettings = true;
     private boolean mShowState = true;
 
-    public ObjectHandler(FcDevice device, boolean showSettings, boolean showState){
+    public ObjectHandler(FcDevice device, boolean showSettings, boolean showState) {
         mFcDevice = device;
 
         mShowSettings = showSettings;
         mShowState = showState;
     }
 
-    public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
-            throws IOException, ServletException
-    {
+    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
+
         response.setCharacterEncoding("utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
 
+        if (request.getMethod().equals("POST")) {
+            handlePost(target, baseRequest, request, response);
+        } else if (request.getMethod().equals("GET")) {
+            handleGet(target, baseRequest, request, response);
+        }
+        baseRequest.setHandled(true);
+    }
+
+    public void handleGet(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
         PrintWriter out = response.getWriter();
 
         List<String> targetObjects = Arrays.asList(target.split("/"));
 
         SortedMap<String, UAVTalkXMLObject> objects = new TreeMap<>();
 
-        if(request.getMethod().equals("POST")) {
-            BufferedReader br = request.getReader();
-            String json = "";
-            while (br.ready()) {
-                json += br.readLine();
-            }
-            System.out.println(json);
-            json = json.replaceFirst("json=", "");
-            System.out.println(json);
-            json = URLDecoder.decode(json, "utf-8");
-            System.out.println(json);
-            System.out.println();
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode actualObj = mapper.readTree(json);
-            out.println(actualObj.asText());
-            out.println(mapper.toString());
-
-        }
-
-        //request all objects
-        for(UAVTalkXMLObject xmlObj : mFcDevice.getObjectTree().getXmlObjects().values()) {
-            if(targetObjects.size() == 0 || targetObjects.contains(xmlObj.getName())) {
+        for (UAVTalkXMLObject xmlObj : mFcDevice.getObjectTree().getXmlObjects().values()) {
+            if (targetObjects.size() == 0 || targetObjects.contains(xmlObj.getName())) {
                 if (mShowSettings && xmlObj.isSettings() || mShowState && !xmlObj.isSettings()) {
                     mFcDevice.requestObject(xmlObj.getName());
                     objects.put(xmlObj.getName(), xmlObj);
@@ -95,56 +84,53 @@ public class ObjectHandler extends AbstractHandler {
             }
         }
 
-        SortedMap<String, UAVTalkObjectSerializer> uavObjects= new TreeMap<>();
+        SortedMap<String, UAVTalkObjectSerializer> uavObjects = new TreeMap<>();
 
-        for(UAVTalkXMLObject xmlObj : objects.values()) {
-                UAVTalkObjectSerializer os = new UAVTalkObjectSerializer();
-                if (targetObjects.size() == 0 || targetObjects.contains(xmlObj.getName())) {
-                    if (mShowSettings && xmlObj.isSettings() || mShowState && !xmlObj.isSettings()) {
-                        UAVTalkObject obj = mFcDevice.getObjectTree().getObjectFromName(xmlObj.getName());
-                        int i = 0;
-                        for (UAVTalkObjectInstance inst : obj.getInstances().values()) {
-                            UAVTalkInstanceSerializer is = new UAVTalkInstanceSerializer();
-                            for (UAVTalkXMLObject.UAVTalkXMLObjectField xmlField : xmlObj.getFields().values()) {
-                                UAVTalkFieldSerializer fs = new UAVTalkFieldSerializer();
-                                boolean hasElements = true;
-                                Object res = null;
-                                for (String element : xmlField.getElements()) {
-                                    try {
-                                        res = mFcDevice.getObjectTree().getData(xmlObj.getName(), i, xmlField.getName(), element);
-                                        if (element == null || xmlField.getElements().size() == 1 && (element.equals("") || element.equals("0"))) {
-                                            hasElements = false;
-                                            fs.setElements(null);
-                                            fs.setValue(res);
-                                        } else {
-                                            fs.getElements().put(element, res);
-                                            fs.setValue(null);
-                                        }
-                                    } catch (UAVTalkMissingObjectException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                if (hasElements) {
-                                    is.getFields().put(xmlField.getName(), fs);
+        for (UAVTalkXMLObject xmlObj : objects.values()) {
+            UAVTalkObjectSerializer os = new UAVTalkObjectSerializer();
+            if (targetObjects.size() == 0 || targetObjects.contains(xmlObj.getName())) {
+                UAVTalkObject obj = mFcDevice.getObjectTree().getObjectFromName(xmlObj.getName());
+                for (int i = 0; i < obj.getInstances().values().size(); i++) {
+                    UAVTalkInstanceSerializer is = new UAVTalkInstanceSerializer();
+                    for (UAVTalkXMLObject.UAVTalkXMLObjectField xmlField : xmlObj.getFields().values()) {
+                        UAVTalkFieldSerializer fs = new UAVTalkFieldSerializer();
+                        boolean hasElements = true;
+                        Object res = null;
+                        for (String element : xmlField.getElements()) {
+                            try {
+                                res = mFcDevice.getObjectTree().getData(xmlObj.getName(), i, xmlField.getName(), element);
+                                if (element == null || xmlField.getElements().size() == 1 && (element.equals("") || element.equals("0"))) {
+                                    hasElements = false;
+                                    fs.setElements(null);
+                                    fs.setValue(res);
                                 } else {
-                                    is.getFields().put(xmlField.getName(), res);
+                                    fs.getElements().put(element, res);
+                                    fs.setValue(null);
                                 }
+                            } catch (UAVTalkMissingObjectException e) {
+                                e.printStackTrace();
                             }
-                            os.getInstances().put(i, is);
+                        }
+                        if (hasElements) {
+                            is.getFields().put(xmlField.getName(), fs);
+                        } else {
+                            is.getFields().put(xmlField.getName(), res);
                         }
                     }
+                    os.getInstances().put(i, is);
                 }
-                uavObjects.put(xmlObj.getName(), os);
+            }
+            uavObjects.put(xmlObj.getName(), os);
         }
 
         try {
-            Thread.sleep(200);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         String callback = request.getParameter("callback");
-        if(callback != null) {
+        if (callback != null) {
             response.setContentType("application/javascript");
             out.println(callback + "(");
         } else {
@@ -156,12 +142,30 @@ public class ObjectHandler extends AbstractHandler {
 
         out.println(mapper.writeValueAsString(uavObjects));
 
-        if(callback != null) {
+        if (callback != null) {
             out.print(")");
         }
 
         out.println("");
+    }
 
-        baseRequest.setHandled(true);
+    public void handlePost(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
+        PrintWriter out = response.getWriter();
+        BufferedReader br = request.getReader();
+        String json = "";
+        while (br.ready()) {
+            json += br.readLine();
+        }
+        System.out.println(json);
+        json = json.replaceFirst("json=", "");
+        System.out.println(json);
+        json = URLDecoder.decode(json, "utf-8");
+        System.out.println(json);
+        System.out.println();
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode actualObj = mapper.readTree(json);
+        out.println(actualObj.asText());
+        out.println(mapper.toString());
     }
 }

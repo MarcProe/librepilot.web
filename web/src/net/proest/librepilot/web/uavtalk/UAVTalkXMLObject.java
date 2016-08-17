@@ -363,13 +363,10 @@ public class UAVTalkXMLObject implements Comparable {
         @JsonProperty("elements")
         public ArrayList<String> getJsonElements() {
             if(mElements.size() <= 1 && (mElements.get(0) == null || mElements.get(0).equals("") || mElements.get(0).equals("0"))) {
-                System.out.println("E");
                 return new ArrayList<>();
             } else {
-                System.out.println("F");
                 return mElements;
             }
-
         }
 
         public String getName() {

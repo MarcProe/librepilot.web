@@ -33,8 +33,6 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import static net.proest.librepilot.web.uavtalk.UAVTalkXMLObject.*;
-
 public class DefinitionHandler extends AbstractHandler {
     private final FcDevice mFcDevice;
     private boolean mShowSettings = true;
@@ -48,8 +46,7 @@ public class DefinitionHandler extends AbstractHandler {
     }
 
     public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
-            throws IOException, ServletException
-    {
+            throws IOException, ServletException {
 
         response.setCharacterEncoding("utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
@@ -87,19 +84,5 @@ public class DefinitionHandler extends AbstractHandler {
         }
 
         baseRequest.setHandled(true);
-    }
-
-    private String getFieldTypeName(int type) {
-        switch (type) {
-            case FIELDTYPE_ENUM: return FIELDNAME_ENUM;
-            case FIELDTYPE_FLOAT32: return FIELDNAME_FLOAT32;
-            case FIELDTYPE_INT8: return FIELDNAME_INT8;
-            case FIELDTYPE_INT16: return FIELDNAME_INT16;
-            case FIELDTYPE_INT32: return FIELDNAME_INT32;
-            case FIELDTYPE_UINT8: return FIELDNAME_UINT8;
-            case FIELDTYPE_UINT16: return FIELDNAME_UINT16;
-            case FIELDTYPE_UINT32: return FIELDNAME_FLOAT32;
-        }
-        return "";
     }
 }

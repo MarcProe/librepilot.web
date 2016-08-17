@@ -16,9 +16,7 @@
 
 package net.proest.librepilot.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.proest.librepilot.web.handler.DefinitionHandler;
-import net.proest.librepilot.web.handler.RootHandler;
 import net.proest.librepilot.web.handler.ObjectHandler;
 import net.proest.librepilot.web.uavtalk.UAVTalkXMLObject;
 import net.proest.librepilot.web.uavtalk.device.FcDevice;
@@ -27,10 +25,14 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
@@ -55,9 +57,12 @@ public class Main {
 
         Server server = new Server(8080);
 
+        String basePath = Main.class.getClassLoader().getResource("web/static").toExternalForm();
+        ResourceHandler resourceHandler = new ResourceHandler();
+        resourceHandler.setResourceBase(basePath);
+        resourceHandler.setDirectoriesListed(true);
         ContextHandler context = new ContextHandler("/");
-        context.setContextPath("/");
-        context.setHandler((Handler) new RootHandler());
+        context.setHandler(resourceHandler);
 
         ContextHandler contextSettings = new ContextHandler("/settings");
         contextSettings.setHandler(new ObjectHandler(dev, true, false));
