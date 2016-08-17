@@ -198,9 +198,7 @@ public class FcUsbDevice extends FcDevice {
         int toWrite = bytes.length;
         UsbPipe pipe = mEndpointOut.getUsbPipe();
         try {
-            System.out.println("open pipe");
             pipe.open();
-            System.out.println("pipe opened");
             while (toWrite > 0) {
                 int sendlen = toWrite - psize > 0 ? psize : toWrite;
                 byte[] buffer = new byte[sendlen + 2];
@@ -209,11 +207,8 @@ public class FcUsbDevice extends FcDevice {
                 buffer[0] = (byte) 0x02;//report id, is always 2. Period.
                 buffer[1] = (byte) ((sendlen) & 0xff);//bytes to send, which is packet.size()-2
 
-                System.out.println("submit pipe");
                 int sent = pipe.syncSubmit(buffer);
-                //pipe.asyncSubmit(buffer);
-                System.out.println("pipe submited");
-                System.out.println(""+sent);
+
                 retval = true;
 
 

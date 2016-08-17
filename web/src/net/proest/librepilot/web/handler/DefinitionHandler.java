@@ -47,11 +47,8 @@ public class DefinitionHandler extends AbstractHandler {
         mShowState = showState;
     }
 
-    public void handle( String target,
-                        Request baseRequest,
-                        HttpServletRequest request,
-                        HttpServletResponse response ) throws IOException,
-            ServletException
+    public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
+            throws IOException, ServletException
     {
 
         response.setCharacterEncoding("utf-8");

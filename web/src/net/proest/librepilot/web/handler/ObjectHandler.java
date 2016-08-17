@@ -54,11 +54,8 @@ public class ObjectHandler extends AbstractHandler {
         mShowState = showState;
     }
 
-    public void handle( String target,
-                        Request baseRequest,
-                        HttpServletRequest request,
-                        HttpServletResponse response ) throws IOException,
-            ServletException
+    public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
+            throws IOException, ServletException
     {
         response.setCharacterEncoding("utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
@@ -138,10 +135,7 @@ public class ObjectHandler extends AbstractHandler {
                     }
                 }
                 uavObjects.put(xmlObj.getName(), os);
-
         }
-
-        //Collections.sort(objects);
 
         try {
             Thread.sleep(200);
@@ -162,53 +156,6 @@ public class ObjectHandler extends AbstractHandler {
 
         out.println(mapper.writeValueAsString(uavObjects));
 
-        /*
-        out.println("{\r\n\t\"uavo\": {");
-
-        boolean hasdata = false;
-        int j = 0;
-        for (UAVTalkXMLObject xmlObj : objects.values()) {
-            j++;
-
-            if(targetObjects.size() == 0 || targetObjects.contains(xmlObj.getName())) {
-                if (mShowSettings && xmlObj.isSettings() || mShowState && !xmlObj.isSettings()) {
-
-                    out.println("\t\t\"" + xmlObj.getName() + "\": {");
-                    int i = 0;
-                    for (UAVTalkXMLObject.UAVTalkXMLObjectField xmlField : xmlObj.getFields().values()) {
-                        i++;
-                        try {
-                            Object res = mFcDevice.getObjectTree().getData(xmlObj.getName(), xmlField.getName());
-                            out.print("\t\t\t\"" + xmlField.getName() + "\": \"" + res + "\"");
-                            if(i < xmlObj.getFields().size()) {
-                                out.println(",");
-                            } else {
-                                out.println("");
-                            }
-                            hasdata = true;
-                        } catch (UAVTalkMissingObjectException e) {
-                            VisualLog.d("Not found:", e.getMessage(), e);
-                            //e.printStackTrace();
-                        }
-                    }
-                    out.print("\t\t}");
-                    if(j < objects.size() && targetObjects.size() == 0 ) {
-                        out.println(",");
-                    } else {
-                        out.println("");
-                    }
-                }
-            }
-
-        }
-
-        if(!hasdata) {
-            out.println("\t\t\t\"error\": \"object not found\",");
-            out.println("\t\t\t\"request\": \""+target+"\"");
-        }
-
-        out.print("\t}\r\n}");
-*/
         if(callback != null) {
             out.print(")");
         }
