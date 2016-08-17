@@ -52,9 +52,8 @@ public class RootHandler extends AbstractHandler {
         out.println("All Objects: <a href=\"/objects\">/objects</a><br />");
         out.println("Specific Object: <a href=\"/objects/ActuatorDesired\">/objects/ActuatorDesired</a><br />");
 
-        out.println("Multiple Objects: <a href=\"/settings/StabilizationSettingsBank2/StabilizationSettingsBank1/StabilizationSettingsBank3/\">/settings/StabilizationSettingsBank2/StabilizationSettingsBank1/StabilizationSettingsBank3/</a>");
-
         out.println("Add a JavaScript Callback: <a href=\"/objects/ActuatorDesired/?callback=getUavo\">/objects/ActuatorDesired/?callback=getUavo</a><br />");
+        out.println("Multiple Objects: <a href=\"/settings/StabilizationSettingsBank2/StabilizationSettingsBank1/StabilizationSettingsBank3/\">/settings/StabilizationSettingsBank2/StabilizationSettingsBank1/StabilizationSettingsBank3/</a><br />");
 
         out.println("<hr />All Settings Definitions: <a href=\"/defsettings\">/defsettings</a><br />");
         out.println("Specific Settings Definition: <a href=\"/defsettings/StabilizationSettingsBank2\">/defsettings/StabilizationSettingsBank2</a><br />");
