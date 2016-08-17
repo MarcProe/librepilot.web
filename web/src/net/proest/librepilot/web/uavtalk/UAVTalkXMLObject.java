@@ -262,6 +262,7 @@ public class UAVTalkXMLObject implements Comparable {
         return H.bytesToHex(H.toBytes(mId));
     }
 
+    @JsonIgnore
     public int getLength() {
         int retval = 0;
         for (int i : mFieldLengths) {
