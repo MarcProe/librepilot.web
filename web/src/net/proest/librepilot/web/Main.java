@@ -26,6 +26,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.util.log.Log;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -57,6 +58,20 @@ public class Main {
 
         Server server = new Server(8080);
 
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Log.getLog().info("SIG", "Gracefully stopping Device");
+                    dev.stop();
+                    Log.getLog().info("SIG", "Gracefully stopping Webserver");
+                    server.stop();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         String basePath = Main.class.getClassLoader().getResource("web/static").toExternalForm();
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setResourceBase(basePath);
@@ -65,14 +80,14 @@ public class Main {
         context.setHandler(resourceHandler);
 
         ContextHandler contextSettings = new ContextHandler("/settings");
-        contextSettings.setHandler(new ObjectHandler(dev, true, false));
+        contextSettings.setHandler((Handler) new ObjectHandler(dev, true, false));
 
         ContextHandler contextState = new ContextHandler("/state");
-        contextState.setHandler(new ObjectHandler(dev, false, true));
+        contextState.setHandler((Handler) new ObjectHandler(dev, false, true));
 
         ContextHandler contextObjects = new ContextHandler("/objects");
         contextObjects.setAllowNullPathInfo(true);
-        contextObjects.setHandler(new ObjectHandler(dev, true, true));
+        contextObjects.setHandler((Handler) new ObjectHandler(dev, true, true));
 
         ContextHandler contextDefSettings = new ContextHandler("/defsettings");
         contextDefSettings.setHandler(new DefinitionHandler(dev, true, false));
@@ -101,7 +116,7 @@ public class Main {
         if (mXmlObjects == null) {
             mXmlObjects = new TreeMap<>();
 
-            String file = "web/assets/15.09-85efdd63.zip";
+            String file = "web/assets/16.09-RC1-4962b01c.zip";
             ZipInputStream zis = null;
             MessageDigest crypt;
             MessageDigest cumucrypt;
